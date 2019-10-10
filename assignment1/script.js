@@ -112,7 +112,7 @@ const renderBarChart = data => {
     // Setup data
     var circleData = [ 
       { "count": d.a, "cx": 400, "cy": 100, "color": "green"},
-      { "count": d.d, "cx": 400, "cy": 350, "color": "red"},
+      { "count": d.d, "cx": 600, "cy": 100, "color": "red"},
     ];
 
     // Add a scale for bubble size
@@ -138,7 +138,7 @@ const renderBarChart = data => {
       //Add the SVG Text Element to the 
       text.enter()
        .append("text")
-       .attr("x", d => d.cx)
+       .attr("x", d => d.cx - 15)
        .attr("y", d => d.cy)
        .text( d => d.count)
        .attr("font-family", "sans-serif")
@@ -158,7 +158,7 @@ const renderBarChart = data => {
 
         text.transition()
           .duration(500)
-          .attr("x", d => d.cx)
+          .attr("x", d => d.cx - 15)
           .attr("y", d => d.cy)
           .text( d => d.count)
           .attr("font-family", "sans-serif")
@@ -169,33 +169,43 @@ const renderBarChart = data => {
     }
   };
 
+  // -- Add legend --//
+  function renderLegend() {
+    var svg = d3.select("#legend")
+      .select("svg");
 
-// // Add legend: circles
-// var valuesToShow = ["Add", "Delete"]
-// var xCircle = 700
-// var xLabel = 440
+    var valuesToShow = [{ "cx": 650, "cy": 50, "color": "green", "label": "Add" }, 
+    { "cx": 650, "cy": 75, "color": "red", "label": "Delete"}]
 
-// d3.select("#bubble")
-//       .select("svg")
-//       .selectAll("legend")
-//       .data(valuesToShow)
-//       .enter()
-//       .append("circle")
-//         .attr("cx", xCircle)
-//         .attr("cy", function(d){ return innerHeight - 20 } )
-//         .attr("r", function(d){ return "1" })
-//         .style("fill", "none")
-//         .attr("stroke", "black")
+    // Add circles to the svg 
+    legend = svg.selectAll("circle")
+      .data(valuesToShow)
+          .enter()
+          .append("circle")
+          .attr("cx", d => d.cx)
+          .attr("cy", d  => d.cy)
+          .attr("r",  "10")
+          .style("fill", d => d.color);
 
+    //add labels
+    labels = svg.selectAll("text")
+      .data(valuesToShow)
+       .enter()
+       .append("text")
+       .attr("x", d => d.cx + 15)
+       .attr("y", d => d.cy + 5)
+       .text( d => d.label)
+       .attr("font-family", "sans-serif")
+       .attr("font-size", "10px")
+       .attr("fill", "black")
+       .attr("text-align", "center");
+  }
 
   var dataUrl = "https://raw.githubusercontent.com/elrufaie/w209/master/commits.json";
 
   d3.json(dataUrl, function(error, data) {
     if (error) throw error;
 
-   //create crossfilter
-   var csData = crossfilter(data[0]);
-   var weeks_filter = csData.dimension(d => d.w);
-
    renderBarChart(data);
+   renderLegend();
 });
